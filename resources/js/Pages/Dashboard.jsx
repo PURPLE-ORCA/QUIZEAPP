@@ -1,5 +1,6 @@
+// resources/js/Pages/Dashboard.jsx
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
 export default function Dashboard() {
     return (
@@ -13,10 +14,32 @@ export default function Dashboard() {
             <Head title="Dashboard" />
 
             <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
-                            You're logged in!
+                            <h3 className="text-lg font-medium mb-4">Admin Navigation</h3>
+
+                            {/* Links to Admin Sections */}
+                            <div className="space-y-4">
+                                <Link href="/admin/topics">
+                                    <button className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                        Manage Topics
+                                    </button>
+                                </Link>
+
+                                {/* Future Links */}
+                                <Link href="/admin/quizzes">
+                                    <button className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                        Manage Quizzes
+                                    </button>
+                                </Link>
+
+                                <Link href="/admin/questions">
+                                    <button className="w-full bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                                        Manage Questions
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>

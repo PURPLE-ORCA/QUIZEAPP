@@ -3,64 +3,73 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quiz;
-use App\Http\Requests\StoreQuizRequest;
-use App\Http\Requests\UpdateQuizRequest;
+use App\Models\Topic;
+use Illuminate\Http\Request;
 
 class QuizController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Show all quizzes (GET /quizzes)
     public function index()
     {
-        //
+        $quizzes = Quiz::with('topic')->get(); // Include topics for context.
+        return inertia('Admin/Quizzes/Index', compact('quizzes'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Show form to create a new quiz (GET /quizzes/create)
     public function create()
     {
-        //
+        $topics = Topic::all(); // Need topics to attach quizzes to.
+        return inertia('Admin/Quizzes/Create', compact('topics'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreQuizRequest $request)
+    // Store a new quiz in the database (POST /quizzes)
+    public function store(Request $request)
     {
-        //
+        $request->validate([
+            'topic_id' => 'required|exists:topics,id',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'difficulty' => 'required|in:easy,medium,hard,masochist_mode',
+        ]);
+
+        Quiz::create($request->all());
+
+        return redirect()->route('quizzes.index')->with('success', 'Quiz created! Now add questions to make it fun.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // Show a specific quiz (GET /quizzes/{quiz})
     public function show(Quiz $quiz)
     {
-        //
+        $quiz->load('questions'); // Load questions for the quiz.
+        return inertia('Admin/Quizzes/Show', compact('quiz'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // Show form to edit a quiz (GET /quizzes/{quiz}/edit)
     public function edit(Quiz $quiz)
     {
-        //
+        $topics = Topic::all(); // Need topics for the dropdown.
+        return inertia('Admin/Quizzes/Edit', compact('quiz', 'topics'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateQuizRequest $request, Quiz $quiz)
+    // Update a quiz in the database (PUT/PATCH /quizzes/{quiz})
+    public function update(Request $request, Quiz $quiz)
     {
-        //
+        $request->validate([
+            'topic_id' => 'required|exists:topics,id',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'difficulty' => 'required|in:easy,medium,hard,masochist_mode',
+        ]);
+
+        $quiz->update($request->all());
+
+        return redirect()->route('quizzes.index')->with('success', 'Quiz updated! Still as hard as ever.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Delete a quiz from the database (DELETE /quizzes/{quiz})
     public function destroy(Quiz $quiz)
     {
-        //
+        $quiz->delete(); // Poof! Gone forever.
+        return redirect()->route('quizzes.index')->with('success', 'Quiz deleted! Hope no one was taking it.');
     }
 }
