@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Quiz;
 use App\Models\Topic;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class QuizController extends Controller
 {
@@ -40,7 +41,7 @@ class QuizController extends Controller
     // Show a specific quiz (GET /quizzes/{quiz})
     public function show(Quiz $quiz)
     {
-        $quiz->load('questions'); // Load questions for the quiz.
+        $quiz->load('questions', 'topic'); 
         return inertia('Admin/Quizzes/Show', compact('quiz'));
     }
 

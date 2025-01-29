@@ -25,6 +25,9 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('admin/topics', TopicController::class);
 });
+Route::middleware(['auth'])->group(function () {
+    Route::resource('admin/quizzes', quizController::class);
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
