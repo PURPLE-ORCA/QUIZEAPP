@@ -16,6 +16,12 @@ class QuizController extends Controller
         return inertia('Admin/Quizzes/Index', compact('quizzes'));
     }
 
+    public function indexForWelcome()
+    {
+        $quizzes = Quiz::with('topic')->get(); // Fetch quizzes with their topics.
+        return inertia('Welcome', compact('quizzes')); // Pass quizzes to the Welcome view.
+    }
+
     // Show form to create a new quiz (GET /quizzes/create)
     public function create()
     {
@@ -43,6 +49,12 @@ class QuizController extends Controller
     {
         $quiz->load('questions', 'topic'); 
         return inertia('Admin/Quizzes/Show', compact('quiz'));
+    }
+
+    public function userShow (Quiz $quiz)
+    {
+        $quiz->load('questions', 'topic');
+        return inertia('Quiz/Show', compact('quiz'));
     }
 
     // Show form to edit a quiz (GET /quizzes/{quiz}/edit)
