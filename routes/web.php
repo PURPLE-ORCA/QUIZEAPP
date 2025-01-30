@@ -28,6 +28,12 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('admin/quizzes', quizController::class);
 });
+Route::middleware(['auth'])->group(function () {
+    Route::resource('admin/questions', QuestionController::class);
+});
+// Route::delete('/admin/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+Route::get('/admin/quizzes/{quiz}/questions/create', [QuestionController::class, 'create'])->name('questions.create');
+Route::post('/admin/quizzes/{quiz}/questions', [QuestionController::class, 'store'])->name('questions.store');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

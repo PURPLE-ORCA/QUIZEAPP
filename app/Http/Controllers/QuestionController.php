@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Question;
 use App\Models\Quiz;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class QuestionController extends Controller
 {
@@ -23,7 +24,7 @@ class QuestionController extends Controller
 
     // Store a new question in the database (POST /quizzes/{quiz}/questions)
     public function store(Request $request, Quiz $quiz)
-    {
+    {               
         $request->validate([
             'question_text' => 'required|string|max:500',
             'option1' => 'required|string|max:255',
@@ -57,7 +58,7 @@ class QuestionController extends Controller
             'option1' => 'required|string|max:255',
             'option2' => 'required|string|max:255',
             'option3' => 'required|string|max:255',
-            'correct_option' => 'required|in:1,2,3',
+            'correct_option' => 'required',
         ]);
 
         $question->update($request->all());

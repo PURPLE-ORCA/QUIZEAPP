@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('quiz_id')->constrained('quizzes')->onDelete('cascade');
-            $table->text('question_text');
-            $table->text('option1');
-            $table->text('option2');
-            $table->text('option3');
-            $table->enum('correct_option' , ['option1', 'option2', 'option3']);
+            $table->text('question_text')->nullable(false);
+            $table->text('option1')->nullable(false);
+            $table->text('option2')->nullable(false);
+            $table->text('option3')->nullable(false);
+            $table->enum('correct_option', ['option1', 'option2', 'option3'])->nullable(false);
             $table->timestamps();
         });
     }
