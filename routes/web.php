@@ -49,6 +49,11 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/', [QuizController::class, 'indexForWelcome'])->name('quizzes.welcome');
 Route::get('/quizzes/{quiz}', [QuizController::class, 'userShow'])->name('quiz.show');
+Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit'])->name('quizzes.submit');
 
+// Route::get('/quizzes/{quiz}', [QuizController::class, 'userShow'])->name('quiz.show');
+// Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit'])->name('quizzes.submit');
+
+Route::get('/quizzes/{quiz}/results', [QuizController::class, 'results'])->name('quiz.results');
 
 require __DIR__.'/auth.php';

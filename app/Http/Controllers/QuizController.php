@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Quiz;
 use App\Models\Topic;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class QuizController extends Controller
@@ -84,5 +85,58 @@ class QuizController extends Controller
     {
         $quiz->delete(); // Poof! Gone forever.
         return redirect()->route('quizzes.index')->with('success', 'Quiz deleted! Hope no one was taking it.');
+    }
+    public function submit(Request $request, Quiz $quiz)
+    {
+        // Validate the request
+        $request->validate([
+            'answers' => 'required|array', // Ensure answers are provided as an array
+        ]);
+    
+        $answers = $request->input('answers'); // Get user answers
+        $score = 0;
+        $results = []; // To store detailed results for feedback
+    
+        foreach ($quiz->questions as $question) {
+            $userAnswer = $answers[$question->id] ?? null; // Get the user's answer for this question
+            $isCorrect = $userAnswer === $question->correct_option;
+    
+            if ($isCorrect) {
+                $score++; // Increment score for correct answers
+            }
+    
+            // Store detailed results for feedback
+            $results[] = [
+                'question_id' => $question->id,
+                'question_text' => $question->question_text,
+                'user_answer' => $userAnswer,
+                'correct_answer' => $question->correct_option,
+                'is_correct' => $isCorrect,
+            ];
+        }
+    
+        // Calculate the percentage score
+        $totalQuestions = $quiz->questions->count();
+        $percentageScore = ($score / $totalQuestions) * 100;
+    
+        // Save the user's attempt in the database
+        $quiz->attempts()->create([
+            'user_id' => auth::id(),
+            'score' => $score,
+            'total_questions' => $totalQuestions,
+            'percentage_score' => $percentageScore,
+            'details' => json_encode($results), // Store detailed results as JSON
+        ]);
+    
+        // Redirect back to the results page with flash data
+        return redirect()->route('quiz.results', $quiz)->with([
+            'success' => "Quiz submitted successfully! Your score: {$score}/{$totalQuestions} ({$percentageScore}%)",
+            'results' => $results, // Pass detailed results for feedback
+        ]);
+    }
+
+    public function results(Quiz $quiz)
+    {
+        return inertia('Quiz/Results', compact('quiz'));
     }
 }

@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('quiz_id')->constrained('quizzes')->onDelete('cascade');
-            $table->integer('score');
+            $table->integer('score')->nullable(); // Total score
+            $table->integer('total_questions')->nullable(); // Total number of questions
+            $table->decimal('percentage_score', 5, 2)->nullable(); // Percentage score
+            $table->json('details')->nullable(); // JSON field for detailed results
             $table->timestamps();
         });
     }
