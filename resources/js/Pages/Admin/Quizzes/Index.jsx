@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import ConfirmationModal from '@/Components/ConfirmationModal'; 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
@@ -22,23 +22,11 @@ const Index = ({ quizzes }) => {
 
     const handleConfirmDelete = () => {
         if (quizToDelete) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/admin/quizzes/${quizToDelete.id}`;
-            const methodInput = document.createElement('input');
-            methodInput.type = 'hidden';
-            methodInput.name = '_method';
-            methodInput.value = 'DELETE';
-            form.appendChild(methodInput);
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            form.appendChild(csrfInput);
-            document.body.appendChild(form);
-            form.submit();
+            router.delete(`/admin/quizzes/${quizToDelete.id}`, {
+                preserveState: true,
+                onSuccess: () => closeModal(),
+            });
         }
-        closeModal();
     };
 
     const handleBulkDelete = () => {
@@ -50,23 +38,16 @@ const Index = ({ quizzes }) => {
 
     const handleConfirmBulkDelete = () => {
         if (bulkDeleteQuizzes && bulkDeleteQuizzes.length > 0) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/admin/quizzes/bulk-delete';
-            const quizzesInput = document.createElement('input');
-            quizzesInput.type = 'hidden';
-            quizzesInput.name = 'quizzes[]';
-            quizzesInput.value = JSON.stringify(bulkDeleteQuizzes.map(q => q.id));
-            form.appendChild(quizzesInput);
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            form.appendChild(csrfInput);
-            document.body.appendChild(form);
-            form.submit();
+            router.post('/admin/quizzes/bulk-delete', {
+                quizzes: bulkDeleteQuizzes.map(q => q.id), // Send quiz IDs as an array
+            }, {
+                preserveState: true,
+                onSuccess: () => {
+                    setSelectedQuizzes([]); // Clear selected quizzes after deletion
+                    closeModal();
+                },
+            });
         }
-        closeModal();
     };
 
     const handleCheckboxChange = (quiz) => {

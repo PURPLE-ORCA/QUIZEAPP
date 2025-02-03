@@ -57,5 +57,6 @@ Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit'])->name('
 Route::get('/quizzes/{quiz}/results', [QuizController::class, 'results'])->name('quiz.results');
 
 Route::post('/admin/quizzes/bulk-delete', [QuizController::class, 'bulkDelete'])->name('quizzes.bulk-delete');
+Route::post('/admin/questions/bulk-delete', [QuestionController::class, 'bulkDelete'])->name('questions.bulk-delete');
 
 require __DIR__.'/auth.php';

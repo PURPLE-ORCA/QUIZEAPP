@@ -91,13 +91,12 @@ class QuizController extends Controller
     {
         $request->validate([
             'quizzes' => 'required|array',
-            'quizzes.*' => 'exists:quizzes,id',
+            'quizzes.*' => 'exists:quizzes,id', // Ensure all IDs exist in the quizzes table
         ]);
-
-        $quizIds = json_decode($request->input('quizzes'), true);
-
-        Quiz::whereIn('id', $quizIds)->delete();
-
+    
+        $quizIds = $request->input('quizzes'); // Get the array of quiz IDs
+        Quiz::whereIn('id', $quizIds)->delete(); // Delete the quizzes
+    
         return redirect()->back()->with('success', 'Selected quizzes deleted successfully.');
     }
     

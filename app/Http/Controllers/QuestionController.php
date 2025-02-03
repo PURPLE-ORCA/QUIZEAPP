@@ -74,4 +74,17 @@ class QuestionController extends Controller
 
         return redirect()->route('quizzes.show', $quiz)->with('success', 'Question deleted! One less headache.');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'questions' => 'required|array',
+            'questions.*' => 'exists:questions,id', // Ensure all IDs exist in the questions table
+        ]);
+
+        $questionIds = $request->input('questions'); // Get the array of question IDs
+        Question::whereIn('id', $questionIds)->delete(); // Delete the questions
+
+        return redirect()->back()->with('success', 'Selected questions deleted successfully.');
+    }
 }
