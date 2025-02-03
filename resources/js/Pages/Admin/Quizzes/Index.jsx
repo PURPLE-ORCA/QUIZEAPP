@@ -6,6 +6,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 const Index = ({ quizzes }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [quizToDelete, setQuizToDelete] = useState(null);
+    const [selectedQuizzes, setSelectedQuizzes] = useState([]);
+    const [bulkDeleteQuizzes, setBulkDeleteQuizzes] = useState(null); // State for bulk delete
 
     const openModal = (quiz) => {
         setQuizToDelete(quiz);
@@ -15,32 +17,66 @@ const Index = ({ quizzes }) => {
     const closeModal = () => {
         setIsModalOpen(false);
         setQuizToDelete(null);
+        setBulkDeleteQuizzes(null); // Reset bulk delete state
     };
 
     const handleConfirmDelete = () => {
         if (quizToDelete) {
-            if (quizToDelete) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/admin/quizzes/${quizToDelete.id}`;
-    
-                const methodInput = document.createElement('input');
-                methodInput.type = 'hidden';
-                methodInput.name = '_method';
-                methodInput.value = 'DELETE';
-                form.appendChild(methodInput);
-    
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = '_token';
-                csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                form.appendChild(csrfInput);
-    
-                document.body.appendChild(form);
-                form.submit();
-            }
-            closeModal();
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/quizzes/${quizToDelete.id}`;
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(methodInput);
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            form.appendChild(csrfInput);
+            document.body.appendChild(form);
+            form.submit();
         }
+        closeModal();
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedQuizzes.length > 0) {
+            setBulkDeleteQuizzes(selectedQuizzes); // Set quizzes for bulk delete
+            setIsModalOpen(true); // Open confirmation modal
+        }
+    };
+
+    const handleConfirmBulkDelete = () => {
+        if (bulkDeleteQuizzes && bulkDeleteQuizzes.length > 0) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/quizzes/bulk-delete';
+            const quizzesInput = document.createElement('input');
+            quizzesInput.type = 'hidden';
+            quizzesInput.name = 'quizzes[]';
+            quizzesInput.value = JSON.stringify(bulkDeleteQuizzes.map(q => q.id));
+            form.appendChild(quizzesInput);
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            form.appendChild(csrfInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+        closeModal();
+    };
+
+    const handleCheckboxChange = (quiz) => {
+        setSelectedQuizzes((prevSelected) => {
+            if (prevSelected.some((q) => q.id === quiz.id)) {
+                return prevSelected.filter((q) => q.id !== quiz.id);
+            } else {
+                return [...prevSelected, quiz];
+            }
+        });
     };
 
     return (
@@ -50,10 +86,33 @@ const Index = ({ quizzes }) => {
                 <Link href="/admin/quizzes/create" className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md inline-block mb-4">
                     Create New Quiz
                 </Link>
+                {/* Bulk Actions */}
+                {selectedQuizzes.length > 0 && (
+                    <div className="mb-4">
+                        <button
+                            onClick={handleBulkDelete}
+                            className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg shadow-md"
+                        >
+                            Delete Selected ({selectedQuizzes.length})
+                        </button>
+                    </div>
+                )}
                 <div className="overflow-x-auto">
                     <table className="min-w-full bg-zinc-800 border border-zinc-700 rounded-md">
                         <thead>
                             <tr className="bg-zinc-700 text-zinc-300">
+                                <th className="py-3 px-4 border-b w-8">
+                                    <input
+                                        type="checkbox"
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedQuizzes(quizzes);
+                                            } else {
+                                                setSelectedQuizzes([]);
+                                            }
+                                        }}
+                                    />
+                                </th>
                                 <th className="py-3 px-4 border-b">Title</th>
                                 <th className="py-3 px-4 border-b">Topic</th>
                                 <th className="py-3 px-4 border-b">Difficulty</th>
@@ -63,6 +122,13 @@ const Index = ({ quizzes }) => {
                         <tbody>
                             {quizzes.map((quiz, index) => (
                                 <tr key={quiz.id} className={index % 2 === 0 ? 'bg-zinc-800' : 'bg-zinc-700'}>
+                                    <td className="py-3 px-4 border-b">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedQuizzes.some((q) => q.id === quiz.id)}
+                                            onChange={() => handleCheckboxChange(quiz)}
+                                        />
+                                    </td>
                                     <td className="py-3 px-4 border-b">{quiz.title}</td>
                                     <td className="py-3 px-4 border-b">{quiz.topic?.name || 'No Topic'}</td>
                                     <td className="py-3 px-4 border-b">{quiz.difficulty}</td>
@@ -85,14 +151,17 @@ const Index = ({ quizzes }) => {
                         </tbody>
                     </table>
                 </div>
-
                 {/* Confirmation Modal */}
                 <ConfirmationModal
                     isOpen={isModalOpen}
                     onClose={closeModal}
-                    onConfirm={handleConfirmDelete}
-                    title="Delete Quiz"
-                    message={`Are you sure you want to delete the quiz "${quizToDelete?.title}"? `}
+                    onConfirm={bulkDeleteQuizzes ? handleConfirmBulkDelete : handleConfirmDelete}
+                    title={bulkDeleteQuizzes ? "Bulk Delete Quizzes" : "Delete Quiz"}
+                    message={
+                        bulkDeleteQuizzes
+                            ? `Are you sure you want to delete ${bulkDeleteQuizzes.length} selected quizzes?`
+                            : `Are you sure you want to delete the quiz "${quizToDelete?.title}"?`
+                    }
                 />
             </div>
         </AuthenticatedLayout>

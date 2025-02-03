@@ -86,6 +86,21 @@ class QuizController extends Controller
         $quiz->delete(); // Poof! Gone forever.
         return redirect()->route('quizzes.index')->with('success', 'Quiz deleted! Hope no one was taking it.');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'quizzes' => 'required|array',
+            'quizzes.*' => 'exists:quizzes,id',
+        ]);
+
+        $quizIds = json_decode($request->input('quizzes'), true);
+
+        Quiz::whereIn('id', $quizIds)->delete();
+
+        return redirect()->back()->with('success', 'Selected quizzes deleted successfully.');
+    }
+    
     public function submit(Request $request, Quiz $quiz)
     {
         // Validate the request
