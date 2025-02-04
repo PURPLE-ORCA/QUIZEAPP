@@ -7,6 +7,7 @@ use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class QuizController extends Controller
 {
@@ -49,35 +50,9 @@ class QuizController extends Controller
 
     public function userShow(Quiz $quiz)
     {
-        // Fetch questions and randomize their order
+        // Fetch questions in random order
         $questions = $quiz->questions()->inRandomOrder()->get();
-
-        // Shuffle options for each question
-        $questions->each(function ($question) {
-            $options = [
-                'option1' => $question->option1,
-                'option2' => $question->option2,
-                'option3' => $question->option3,
-            ];
-
-            // Extract option keys and values
-            $optionKeys = array_keys($options);
-            $optionValues = array_values($options);
-
-            // Shuffle the option values
-            shuffle($optionValues);
-
-            // Rebuild shuffled options with original keys
-            $shuffledOptions = array_combine($optionKeys, $optionValues);
-
-            // Find the new key for the correct option
-            $correctOptionKey = array_search($question->correct_option, $optionKeys);
-
-            // Assign shuffled options and the new correct option key to the question
-            $question->shuffled_options = $shuffledOptions;
-            $question->shuffled_correct_option = array_keys($shuffledOptions)[array_search($question->correct_option_value, $optionValues)];
-        });
-
+    
         return inertia('Quiz/Show', [
             'quiz' => $quiz,
             'questions' => $questions,
@@ -123,45 +98,69 @@ class QuizController extends Controller
         return redirect()->back()->with('success', 'Selected quizzes deleted successfully.');
     }
     
+
     public function submit(Request $request, Quiz $quiz)
     {
-        $request->validate([
-            'answers' => 'required|array',
-            'answers.*' => 'string|in:option1,option2,option3',
-        ]);
-
+        // Log all incoming answers for debugging
+    
+        // Collect all possible option values
+        $allOptions = $quiz->questions->flatMap(function ($question) {
+            return [$question->option1, $question->option2, $question->option3];
+        })->unique()->values()->toArray();
+    
+        try {
+            $request->validate([
+                'answers' => 'required|array',
+                'answers.*' => 'string|in:' . implode(',', $allOptions),
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Log validation errors
+            return back()->withErrors($e->errors())->withInput();
+        }
+    
+        // Process the quiz submission
         $questions = $quiz->questions()->get();
         $results = [];
-
+    
         foreach ($questions as $question) {
             $userAnswer = $request->input('answers')[$question->id] ?? null;
-            $correctOption = $question->correct_option;
-
-            $options = [
-                'option1' => $question->option1,
-                'option2' => $question->option2,
-                'option3' => $question->option3,
-            ];
-
+            $correctAnswer = $question->correct_option === 'option1'
+                ? $question->option1
+                : ($question->correct_option === 'option2'
+                    ? $question->option2
+                    : $question->option3);
+    
             $results[] = [
                 'question_id' => $question->id,
                 'question_text' => $question->question_text,
-                'user_answer' => $options[$userAnswer] ?? 'Not answered',
-                'correct_answer' => $options[$correctOption],
-                'is_correct' => $userAnswer === $correctOption,
+                'user_answer' => $userAnswer ?? 'Not answered',
+                'correct_answer' => $correctAnswer,
+                'is_correct' => $userAnswer === $correctAnswer,
             ];
         }
-
+    
+        // Calculate the score
         $score = collect($results)->where('is_correct', true)->count();
         $totalQuestions = count($questions);
-
+    
+        // Redirect to results page with success message and results
         return redirect()->route('quiz.results', $quiz)->with([
             'success' => "You scored {$score} out of {$totalQuestions}.",
             'results' => $results,
         ]);
     }
+    
     public function results(Quiz $quiz)
     {
-        return inertia('Quiz/Results', compact('quiz'));
+        // Retrieve flash data
+        $successMessage = session('success');
+        $results = session('results');
+    
+        // Pass data to the inertia view
+        return Inertia::render('Quiz/Results', [
+            'quiz' => $quiz,
+            'success' => $successMessage,
+            'results' => $results,
+        ]);
     }
 }

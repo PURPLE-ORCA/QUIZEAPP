@@ -1,8 +1,8 @@
 import { Head, Link } from '@inertiajs/react';
 
-export default function QuizResults({ quiz, flash }) {
+export default function QuizResults({ quiz, success, results }) {
     return (
-        <div className='bg-black text-white'>
+        <div className="bg-black text-white">
             <Head title={`${quiz.title} - Results`} />
             <div className="mt-6 flex justify-center">
                 <Link
@@ -15,12 +15,12 @@ export default function QuizResults({ quiz, flash }) {
             <div className="p-6 max-w-3xl mx-auto bg-black shadow-lg rounded-lg mt-6">
                 <h1 className="text-3xl font-bold text-center mb-4 text-green-400">{quiz.title} - Results</h1>
                 <p className="text-lg text-gray-400 text-center">Difficulty: {quiz.difficulty}</p>
-                {flash?.success && (
+                {success && (
                     <div className="bg-black border border-green-600 text-green-400 p-4 rounded-md mb-4">
-                        <p className="font-semibold">{flash.success}</p>
-                        {flash.results && (
+                        <p className="font-semibold">{success}</p>
+                        {results && (
                             <ul className="mt-2 space-y-4">
-                                {flash.results.map((result) => (
+                                {results.map((result) => (
                                     <li
                                         key={result.question_id}
                                         className="p-4 border border-gray-700 rounded-md shadow-sm bg-black"
@@ -47,7 +47,7 @@ export default function QuizResults({ quiz, flash }) {
                         )}
                     </div>
                 )}
-                {!flash?.success && (
+                {!success && (
                     <div className="bg-black border border-yellow-400 text-yellow-400 p-4 rounded-md mb-4">
                         <p className="font-semibold">No results found. Please try submitting the quiz again.</p>
                     </div>
