@@ -138,7 +138,7 @@ const Edit = ({ question }) => {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 inline-flex items-center"
+                            className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 inline-flex items-center"
                         >
                             {processing ? (
                                 <svg

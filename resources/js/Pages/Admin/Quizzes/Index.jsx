@@ -62,9 +62,9 @@ const Index = ({ quizzes }) => {
 
     return (
         <AuthenticatedLayout>    
-            <div className="max-w-4xl mx-auto p-6 mt-10 bg-zinc-900 text-white rounded-lg shadow-lg">
-                <h1 className="text-3xl font-bold text-zinc-100 mb-6">Quizzes</h1>
-                <Link href="/admin/quizzes/create" className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md inline-block mb-4">
+            <div className="max-w-4xl mx-auto p-6 mt-10 bg-black text-white rounded-lg shadow-lg">
+                <h1 className="text-3xl font-bold text-green-400 mb-6">Quizzes</h1>
+                <Link href="/admin/quizzes/create" className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg shadow-md inline-block mb-4">
                     Create New Quiz
                 </Link>
                 {/* Bulk Actions */}
@@ -79,9 +79,9 @@ const Index = ({ quizzes }) => {
                     </div>
                 )}
                 <div className="overflow-x-auto">
-                    <table className="min-w-full bg-zinc-800 border border-zinc-700 rounded-md">
+                    <table className="min-w-full bg-black border border-gray-700 rounded-md">
                         <thead>
-                            <tr className="bg-zinc-700 text-zinc-300">
+                            <tr className="bg-gray-800 text-gray-400">
                                 <th className="py-3 px-4 border-b w-8">
                                     <input
                                         type="checkbox"
@@ -92,6 +92,7 @@ const Index = ({ quizzes }) => {
                                                 setSelectedQuizzes([]);
                                             }
                                         }}
+                                        className="accent-green-400"
                                     />
                                 </th>
                                 <th className="py-3 px-4 border-b">Title</th>
@@ -102,12 +103,13 @@ const Index = ({ quizzes }) => {
                         </thead>
                         <tbody>
                             {quizzes.map((quiz, index) => (
-                                <tr key={quiz.id} className={index % 2 === 0 ? 'bg-zinc-800' : 'bg-zinc-700'}>
+                                <tr key={quiz.id} className={index % 2 === 0 ? 'bg-black' : 'bg-gray-800'}>
                                     <td className="py-3 px-4 border-b">
                                         <input
                                             type="checkbox"
                                             checked={selectedQuizzes.some((q) => q.id === quiz.id)}
                                             onChange={() => handleCheckboxChange(quiz)}
+                                            className="accent-green-400"
                                         />
                                     </td>
                                     <td className="py-3 px-4 border-b">{quiz.title}</td>
@@ -115,16 +117,16 @@ const Index = ({ quizzes }) => {
                                     <td className="py-3 px-4 border-b">{quiz.difficulty}</td>
                                     <td className="py-3 px-4 border-b flex space-x-2">
                                         <Link href={`/admin/quizzes/${quiz.id}`} className="text-green-400 hover:underline">
-                                            View
+                                            <i class='bx bxs-show' ></i>
                                         </Link>
                                         <Link href={`/admin/quizzes/${quiz.id}/edit`} className="text-blue-400 hover:underline">
-                                            Edit
+                                            <i class='bx bxs-edit' ></i>
                                         </Link>
                                         <button
                                             onClick={() => openModal(quiz)}
                                             className="text-red-400 hover:underline"
                                         >
-                                            Delete
+                                            <i class='bx bxs-trash-alt' ></i>
                                         </button>
                                     </td>
                                 </tr>
