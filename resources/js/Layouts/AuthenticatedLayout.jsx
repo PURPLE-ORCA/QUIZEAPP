@@ -13,7 +13,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <div className="min-h-screen bg-black dark:bg-black">
-            <nav className="border-b border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-900">
+            <nav className="border-b border-gray-100 bg-black dark:border-gray-700 dark:bg-black">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
                         <div className="flex">
@@ -29,6 +29,16 @@ export default function AuthenticatedLayout({ header, children }) {
                                     active={route().current('dashboard')}
                                 >
                                     Dashboard
+                                </NavLink>
+                                <NavLink
+                                    href="/admin/topics"
+                                >
+                                    Manage Topics
+                                </NavLink>
+                                <NavLink
+                                    href="/admin/quizzes"
+                                >
+                                    Manage Quizzes
                                 </NavLink>
                             </div>
                         </div>
@@ -133,6 +143,16 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('dashboard')}
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href="/admin/topics"
+                        >
+                            Manage Topics
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href="/admin/quizzes"
+                        >
+                            Manage Quizzes
                         </ResponsiveNavLink>
                     </div>
 

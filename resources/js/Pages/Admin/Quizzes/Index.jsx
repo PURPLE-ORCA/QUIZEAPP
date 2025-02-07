@@ -79,7 +79,7 @@ const Index = ({ quizzes }) => {
 
     return (
         <AuthenticatedLayout>
-            <div className="max-w-4xl mx-auto p-6 mt-10 bg-black text-white rounded-lg shadow-lg">
+            <div className="max-w-7xl mx-auto p-6 mt-10 bg-black text-white rounded-lg shadow-lg">
                 <h1 className="text-3xl font-bold text-green-400 mb-6">Quizzes</h1>
                 <Link href="/admin/quizzes/create" className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg shadow-md inline-block mb-4">
                     Create New Quiz

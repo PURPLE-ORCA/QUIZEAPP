@@ -46,7 +46,7 @@ export default function TopicsIndex({ topics }) {
 
     return (
         <AuthenticatedLayout >
-            <div className="max-w-4xl mx-auto p-6 bg-black-900 text-white rounded-lg shadow-lg">
+            <div className="max-w-7xl mx-auto p-6 bg-black-900 text-white rounded-lg shadow-lg">
                 <h1 className="text-5xl font-bold text-white-100 mb-6">Topics</h1>
                 <Link href="/admin/topics/create">
                     <button className="mb-4 px-4 py-2 bg-green-900 hover:bg-green-600 text-white rounded-lg shadow-md">
